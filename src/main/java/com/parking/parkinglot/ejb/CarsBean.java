@@ -11,6 +11,7 @@ import com.parking.parkinglot.entities.User;
 import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
 
+
 @Stateless
 
 public class CarsBean {
@@ -57,6 +58,36 @@ public class CarsBean {
 
         entityManager.persist(car);
 
+    }
+    public CarDto findById(Long carId) {
+        LOG.info("findById");
+        Car car = entityManager.find(Car.class, carId);
+        return new CarDto(
+                car.getId(),
+                car.getLicensePlate(),
+                car.getParkingSpot(),
+                car.getOwner().getUsername()
+        );
+    }
+
+    public void updateCar(Long carId, String licensePlate, String parkingSpot, Long ownerId) {
+        LOG.info("updateCar");
+
+        if (carId == null) {
+            return;
+        }
+
+        User newOwner = entityManager.find(User.class, ownerId);
+        Car car = entityManager.find(Car.class, carId);
+
+        car.setLicensePlate(licensePlate);
+        car.setParkingSpot(parkingSpot);
+
+        if (!newOwner.equals(car.getOwner())) {
+            car.getOwner().getCars().remove(car);
+            car.setOwner(newOwner);
+            newOwner.getCars().add(car);
+        }
     }
 
 }
