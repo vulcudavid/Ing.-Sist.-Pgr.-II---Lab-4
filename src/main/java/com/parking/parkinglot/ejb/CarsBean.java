@@ -10,6 +10,7 @@ import com.parking.parkinglot.entities.Car;
 import com.parking.parkinglot.entities.User;
 import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
+import java.util.Collection;
 
 
 @Stateless
@@ -87,6 +88,14 @@ public class CarsBean {
             car.getOwner().getCars().remove(car);
             car.setOwner(newOwner);
             newOwner.getCars().add(car);
+        }
+    }
+    public void deleteCarsByIds(Collection<Long> carIds) {
+        LOG.info("deleteCarsByIds");
+
+        for (Long carId : carIds) {
+            Car car = entityManager.find(Car.class, carId);
+            entityManager.remove(car);
         }
     }
 
